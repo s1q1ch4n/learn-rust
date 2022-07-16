@@ -10,7 +10,7 @@ A modern language is a language that solves a lot of the problems in its predece
   * No Data Races
 ## cargo-expand
 `cargo install cargo-expand`  
-`rustup toolchian install nightly-x86_64-unknown-linux-gnu`  
+`rustup toolchain install nightly-x86_64-unknown-linux-gnu`  
 `cargo expand`
 ## Memory Management
 * The Stack
@@ -27,3 +27,14 @@ A modern language is a language that solves a lot of the problems in its predece
 * It has no size restrictions.
 * It's accessible by any function, anywhere in the program.
 * Heap allocations are expensive, and we should avoid them when possible.
+## Basic Data Types
+* Booleans (1 byte)
+* Characters (4 byte)
+* Integers
+* Floats
+### Ownership
+* Each value in Rust is owned by a variable.
+* When the owner goes out of scope, the value will be deallocated.
+* There can only be ONE owner at a time.
+### Reference
+Reference allows us to refer to a value without taking ownership of it.
