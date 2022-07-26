@@ -1,14 +1,11 @@
-use server::Server;
-use http::req::Request;
 use http::method::Method;
+use http::req::Request;
+use server::Server;
 
-mod server;
 mod http;
+mod server;
 
 fn main() {
     let server = Server::new("127.0.0.1:8080".to_string());
     server.run();
 }
-
-
-
