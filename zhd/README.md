@@ -137,7 +137,117 @@ let r = &mut answer;
 ```
 因为不能改变内存位置的数据，因此可以有多个不可变引用。
 可变引用只能有一个，因为会修改内存位置的数据，多以只能保持独占。
-
-
-
-
+## Rust中的类型
+* 基本数据类型
+* 自定义复合类型
+* 容器类型
+* 泛型
+* 特定类型
+### 字符串
+* 字面量
+* 动态可增长字符串
+* 从一段字符串中截取的片段
+* 字符串编码
+* FFI中需要转换字符串到C或OS本地字符串
+* 遵循特定格式的文件路径
+### 指针类型
+* 原始指针，*mut T和*const T。
+* NonNull指针。它是Rust建议的*mut T指针的替代指针。NonNull即非空指针，并且是遵循生命周期类型协变规则。
+* 函数指针，指向代码的指针，而非数据。可以使用他直接调用函数。
+### 引用
+* &T和&mut T。
+* 引用与指针的主要区别：
+  * 引用不可能为空。
+  * 拥有声明周期。
+  * 受借用检查器保护不会发生悬垂指针等问题。
+### 元组
+唯一的异构序列
+* 不同长度的元组是不同类型。
+* 单元类型的唯一实例等价与空元组。
+* 当元组只有一个元素的时候，要在元素末尾加逗号分隔，这是为了方便和括号操作符区分开来。
+### Never类型
+* 类型理论中，叫做底类型，底类型不包含任何值，但它可以合到任何其他类型。
+* Never类型用“!”表示。
+* 目前还未稳定，但是在Rust内部已经在使用了。
+### 自定义复合类型
+* 结构struct
+* 枚举enum
+* 联合union
+#### struct
+* 具名结构体
+* 元组结构体
+* 单元结构体
+```rust
+struct Point {
+    x: f32,
+    y: f32,
+}
+struct Pair(i32, f32);
+struct Unit;
+```
+#### NewType模式
+当元组结构体只包含一个成员时
+```rust
+struct Score(u32);
+impl Score {
+    fn pass(&self) -> bool {
+        self.0 >= 60
+    }
+}
+fn main() {
+    let s = Score(59);
+    assert_eq!(s.pass(), false);
+}
+```
+## 内部可变性（interior mutability）
+* 与继承式可变相对应
+* 由可变性核心原语UnsafeCell<T>提供支持
+* 基于UnsafeCell<T>提供了Cell<T>和RefCell<T>
+### Cell\<T\>
+```rust
+use std::cell:Cell;
+struct Foo {
+    x: u32,
+    y: Cell<u32>
+}
+fn main() {
+    let foo = Foo{x: 1, y: Cell::new(3)};
+    foo.y.set(5);
+    assert_eq!(5, foo.y.get());
+    
+    let s = "hello".to_string();
+    let bar = Cell::new(s);
+    let x = bar.into_inner();
+    bar; // error: use of moved value
+}
+```
+`Cell<T>`是通过移进移出值达到内部可变的目的。
+### RefCell\<T\>
+```rust
+use std::cell:RefCell;
+fn main() {
+    let x = RefCell::new(vec![1,2,3,4]);
+    println("{:?}", x.borrow());
+    x.borrow_mut().push(5);
+    println("{:?}", x.borrow());
+}
+```
+## 泛型
+泛型即参数化类型
+```rust
+fn foo<T>(x: T) -> T {
+    return x;
+}
+fn main() {
+    assert_eq!(foo(1), 1);
+    assert_eq!(foo("hello"), "hello");
+}
+```
+## Rust中类型的行为
+Rust中一切皆类型。类型系统如何保证类型的安全交互呢？
+### 类型的行为
+`trait`是行为的抽象，Rust引入其来统一行为接口。
+### 孤儿规则
+trait或类型必须有一个在本地定义。
+### 仿射类型（Affine Type）
+类型系统中用于标识内存等资源，最多智能被使用一次。
