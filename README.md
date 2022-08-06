@@ -9,7 +9,7 @@ A modern language is a language that solves a lot of the problems in its predece
   * Modern package manager
   * No Data Races
 ## cargo-expand
-```shell
+```
 cargo install cargo-expand 
 rustup toolchain install nightly-x86_64-unknown-linux-gnu  
 cargo expand
@@ -45,14 +45,16 @@ Reference allows us to refer to a value without taking ownership of it.
 ### &str
 `&str` is called a string slice of string. It's an immutable reference to a part of a string.
  A sting slice is a view inside an existing string.  
-字符串字面量存在堆上，&str是对字符串一部分的引用。这样做的好处的是，如果经常使用（不修改）该字符串（或其中的一部分），不用再创建（相同的字符串存多份），节省量空间。
+字符串字面量存在堆上，&str是对字符串一部分的引用。这样做的好处的是，如果经常使用（不修改）该字符串（或其中的一部分），不用再创建（相同的字符串存多份），
+节省量空间。
 ```rust
 let string_literal = "1234"; // 包含了整个字符串的字符串切片
 ```
 为什么是字符串切片而不是字符串？  
 * 因为字符串可以在运行时动态地增长或缩短，而字符串切片是不可变的。
 * 我们不想有按下标访问字符串的行为（如`string[10]`），因为在rust中，所有的字符串都是UTF-8编码，我们不能确定字符串中一个字符总是占一个字节。
-正如我们所知道的，所有ASCII字符是占一个字节。但是如果是中文、日文、emoji，它们占多个字节。因此，`string[10]`这种写法并不是总是获取第10个字符，而是获取第10个字节。
+正如我们所知道的，所有ASCII字符是占一个字节。但是如果是中文、日文、emoji，它们占多个字节。因此，`string[10]`这种写法并不是总是获取第10个字符，
+* 而是获取第10个字节。
 
 ## Enum
 Enums are special types which have a finite set of values.
