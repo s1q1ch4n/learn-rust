@@ -224,7 +224,7 @@ fn main() {
 `Cell<T>`是通过移进移出值达到内部可变的目的。
 ### RefCell\<T\>
 ```rust
-use std::cell:RefCell;
+use std::cell::RefCell;
 fn main() {
     let x = RefCell::new(vec![1,2,3,4]);
     println("{:?}", x.borrow());
@@ -261,7 +261,7 @@ trait或类型必须有一个在本地定义。
 ### 结论
 函数项类型可以通过显式指定函数类型转换为一个函数指针类型。
 在写代码的时候，尽可能第使用函数项类型，不到万不得已，不要使用函数指针类型，这样有助于享受零大小类型的优化。
-### 闭包
+## 闭包
 函数无法捕获环境变量，闭包可以。
 ```rust
 fn counter(i: i32) -> fn(i32) -> i32 {
@@ -284,3 +284,59 @@ fn main() {
     assert_eq(3, f(1));
 }
 ```
+### 闭包的实现原理
+```rust
+fn main() {
+  // 未捕获环境变量 => 所有权（ownership）
+  let c1 = || println("hello");
+  c1();
+  
+  // 捕获并修改环境变量 => 可变借用（&mut T）
+  let mut arr = [1, 2, 3];
+  let mut c2 = |i| {
+    arr[0] = i;
+    println("{:?}", arr);
+  };
+  c2(0);
+  
+  // 捕获但不修改环境变量 => 不可变借用（&T）
+  let answer = 42;
+  let c3 = || {
+    println("{}", answer);
+  };
+  c3();
+}
+```
+### 闭包类型
+* 如果没有捕获任何变量，则实现FnOnce。
+* 如果有捕获变量，并且会对捕获变量进行修改，则实现FnMut。
+* 如果有捕获变量，并且不会对捕获变量进行修改，则实现Fn。  
+**特殊情况:**
+* 编译期会把FnOne当成fn(T)函数指针去看待。
+* Fn/FnMut/FnOnce这三者trait关系依次是继承，它们正好对应于所有权语义三件套。
+
+## 逃逸闭包与非逃逸闭包
+逃逸闭包：能作为函数返回，在返回过程中不被消费的闭包。反之，为非逃逸闭包。
+```rust
+#![feature(unboxed_closures, fn_traits)]
+fn c_mut() -> impl FnMut(i32) -> [i32;3] {
+  let mut arr = [0, 1, 2];
+  move |i| { arr[0] = i; arr }
+}
+fn main() {
+  let i = 42;
+  let mut arr_closure = c_mut();
+  pirntln!("{:?}", arr_closure(i));
+}
+```
+### 闭包自身实现了哪些trait
+* Sized：所有闭包默认实现
+* Copy/Clone：取决于环境变量是否实现Copy以及它如何被闭包使用。
+  * 如果环境变量实现了Copy，闭包如果可以变借用方式捕获环境变量，并对其进行修改，则闭包自身不会实现Copy。
+  * 如果环境变量自身是Move语义，则闭包内捕获环境变量的操作设计修改环境变量或消耗环境变量，则闭包自身不会实现Copy。
+* Sync/Send：
+  * 如果所有捕获变量都实现了Sync，则闭包实现Sync。
+  * 如果环境变量都不是“唯一不可变引用”方式获取的，并且都实现了Sync，则闭包实现Send。
+  * 如果环境变量是以“唯一不可变引用”、“可变引用”、Copy或Move所有权捕获的，那闭包实现了Send。
+
+
