@@ -338,5 +338,24 @@ fn main() {
   * 如果所有捕获变量都实现了Sync，则闭包实现Sync。
   * 如果环境变量都不是“唯一不可变引用”方式获取的，并且都实现了Sync，则闭包实现Send。
   * 如果环境变量是以“唯一不可变引用”、“可变引用”、Copy或Move所有权捕获的，那闭包实现了Send。
+## 模式匹配
+模式匹配是一种结构性的结构。
+```rust
+struct Point {
+  x: i32,
+  y: i32,
+}
+fn main() {
+  let (a, b) = (1, 2);
+  let Point{x, y} = Point{x: 3, y: 4};
+}
+```
+### Rust中支持模式匹配的位置
+* let声明
+* 函数和闭包
+* match表达式
+* if let表达式
+* while let表达式
+* for表达式
 
 
