@@ -369,8 +369,13 @@ fn main() {
 * `Vec<T>`和`String`
 * `Rc<T>`和A`Arc<T>`
 * `HashMap<K,V>`
-
-
+## 字符与字符串
+### 字符
+Unicode标量值，其值对应于Rust中u32类型，占4个字节，可以方便地转换为utf-8编码字节序列。
+### 字符串
+* UTF-8字节序列，“Vec<8u>”。
+* str和String两大常用字符串类型。
+* 其他字符串：CStr/CString、OsStr/OsString、Path/PathBuf。
 
 
 
